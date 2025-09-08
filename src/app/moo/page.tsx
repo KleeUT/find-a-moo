@@ -96,6 +96,7 @@ const MooPage = () => {
 
   return (
     <main className={style.moo_main}>
+      <h1>find-a-moo</h1>
       <div className={style.moo_board}>
         {moos.map((row, i) => (
           <div key={i} className={style.moo_row}>
@@ -115,16 +116,17 @@ const MooPage = () => {
           </div>
         ))}
       </div>
-      <div>
+      <div className={style.moo_results}>
         You&apos;ve found {foundMoos.length / 3} moo
-        {foundMoos.length / 3 > 1 ? "s" : ""}
+        {foundMoos.length / 3 === 1 ? "" : "s"}
       </div>
       <div className={style.moo_controls}>
         <button
           className={style.moo_reset}
           onClick={() => {
+            clearClicked();
+            setFoundMoos([]);
             setMoos(generateMoos(15));
-            setClicked(new Map());
           }}
         >
           Reset

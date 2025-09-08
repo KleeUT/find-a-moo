@@ -4,10 +4,14 @@ main.moo_main {
   /* max-width: 100vh; */
   max-height: 100vh;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-@media (width: 40rem) {
+@media (min-width: 50rem) {
   main.moo_main {
-    width: 70%;
+    width: 50%;
   }
 }
 .moo_row {
@@ -32,6 +36,12 @@ main.moo_main {
   background-color: var(--action-primary);
   color: var(--background);
 }
+.moo_board {
+  width: 100%;
+}
+.moo_controls {
+  width: 100%;
+}
 
 .moo_reset {
   margin-top: 20px;
@@ -42,4 +52,12 @@ main.moo_main {
   font-size: 16px;
   border-radius: 5px;
   cursor: pointer;
+  width: 100%;
+}
+
+.moo_results {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
 }
