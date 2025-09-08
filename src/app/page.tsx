@@ -1,95 +1,154 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import { useState } from "react";
+import style from "./page.module.css";
+type Cell = {
+  used: boolean;
+  clicked: boolean;
+  letter: "m" | "o";
+};
 
-export default function Home() {
+type Coordinate = {
+  i: number;
+  j: number;
+};
+
+const MooPage = () => {
+  const [moos, setMoos] = useState(generateMoos(15));
+  const [clicked, setClicked] = useState(new Map<string, boolean>());
+  const [foundMoos, setFoundMoos] = useState<Array<Coordinate>>([]);
+
+  function clearClicked() {
+    console.log("clearing clicked");
+    for (const key of clicked.keys()) {
+      const [i, j] = key.split("-").map(Number);
+      moos[i][j].clicked = false;
+    }
+    setClicked(new Map());
+  }
+
+  function click(i: number, j: number) {
+    console.log({ msg: `clicked ${i},${j}`, size: clicked.size });
+    if (clicked.has(`${i}-${j}`)) {
+      clicked.delete(`${i}-${j}`);
+      moos[i][j].clicked = false;
+    } else {
+      clicked.set(`${i}-${j}`, true);
+      console.log(clicked.size);
+      moos[i][j].clicked = true;
+      setMoos([...moos]);
+      if (clicked.size > 2) {
+        if (isAMoo(clicked, foundMoos)) {
+          console.log("found a moo!");
+          foundMoos.push(
+            ...Array.from(clicked.keys()).map((key) => {
+              const [i, j] = key.split("-").map(Number);
+              moos[i][j].used = true;
+              return { i, j };
+            }),
+          );
+          setFoundMoos(foundMoos);
+        }
+        clearClicked();
+        return;
+      }
+    }
+    setClicked(new Map(clicked));
+  }
+
+  function isAMoo(
+    clicked: Map<string, boolean>,
+    foundMoos: Array<Coordinate>,
+  ): boolean {
+    // check if the clicked cells form an "MOO" pattern
+    const positions = Array.from(clicked.keys())
+      .map((key) => {
+        const [i, j] = key.split("-").map(Number);
+        return { i, j };
+      })
+      .sort((a, b) => a.i - b.i);
+
+    // all positions must be in the same row, column or diagonal
+    const allSameRow = positions.every((pos) => pos.i === positions[0].i);
+    const allSameCol = positions.every((pos) => pos.j === positions[0].j);
+    const allSameDiag1 = positions.every(
+      (pos) => pos.i - pos.j === positions[0].i - positions[0].j,
+    );
+    const allSameDiag2 = positions.every(
+      (pos) => pos.i + pos.j === positions[0].i + positions[0].j,
+    );
+
+    if (!(allSameRow || allSameCol || allSameDiag1 || allSameDiag2)) {
+      return false;
+    }
+    // at least one position must not be in found moos
+    if (
+      positions.every((pos) =>
+        foundMoos.some((found) => found.i === pos.i && found.j === pos.j),
+      )
+    ) {
+      return false;
+    }
+
+    // check if the letters form "MOO"
+    const letters = positions.map((pos) => moos[pos.i][pos.j].letter).join("");
+    return letters === "moo" || letters === "oom";
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+    <main className={style.moo_main}>
+      <h1>🐮 find-a-moo 🐮</h1>
+      <div className={style.moo_board}>
+        {moos.map((row, i) => (
+          <div key={i} className={style.moo_row}>
+            {row.map((cell, j) => (
+              <button
+                key={j}
+                className={
+                  style.moo_cell +
+                  (cell.used ? ` ${style.moo_cell_used}` : "") +
+                  (cell.clicked ? ` ${style.moo_cell_clicked}` : "")
+                }
+                onClick={() => click(i, j)}
+              >
+                {cell.letter}
+              </button>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className={style.moo_results}>
+        You&apos;ve found {foundMoos.length / 3} moo
+        {foundMoos.length / 3 === 1 ? "" : "s"}
+      </div>
+      <div className={style.moo_controls}>
+        <button
+          className={style.moo_reset}
+          onClick={() => {
+            clearClicked();
+            setFoundMoos([]);
+            setMoos(generateMoos(15));
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          Reset
+        </button>
+      </div>
+    </main>
   );
+};
+
+function generateMoos(dimension: number): Array<Array<Cell>> {
+  const moos = new Array(dimension).fill(null).map(() => {
+    return new Array(dimension).fill(null).map(() => ({
+      used: false,
+      clicked: false,
+      letter: pick(),
+    }));
+  });
+  return moos;
 }
+
+function pick(): "m" | "o" {
+  return Math.round(Math.random() * 3) < 1 ? "m" : "o";
+}
+
+export default MooPage;
