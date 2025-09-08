@@ -68,6 +68,10 @@ const MooPage = () => {
       .sort((a, b) => a.i - b.i);
 
     // all positions must be in the same row, column or diagonal
+    const iPositions = positions.map((pos) => pos.i);
+    const jPositions = positions.map((pos) => pos.j);
+    const within3i = Math.max(...iPositions) - Math.min(...iPositions) <= 2;
+    const within3j = Math.max(...jPositions) - Math.min(...jPositions) <= 2;
     const allSameRow = positions.every((pos) => pos.i === positions[0].i);
     const allSameCol = positions.every((pos) => pos.j === positions[0].j);
     const allSameDiag1 = positions.every(
@@ -77,7 +81,11 @@ const MooPage = () => {
       (pos) => pos.i + pos.j === positions[0].i + positions[0].j,
     );
 
-    if (!(allSameRow || allSameCol || allSameDiag1 || allSameDiag2)) {
+    if (
+      !(allSameRow || allSameCol || allSameDiag1 || allSameDiag2) ||
+      !within3i ||
+      !within3j
+    ) {
       return false;
     }
     // at least one position must not be in found moos
