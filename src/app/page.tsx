@@ -13,46 +13,56 @@ type Coordinate = {
   j: number;
 };
 
+function windowLocalStorage(): Storage | null {
+  if (typeof window !== "undefined") {
+    return window.localStorage;
+  }
+  return null;
+}
+
 const MooPage = () => {
   const [date, setDate] = useState(() => {
-    return localStorage.getItem("date");
+    return windowLocalStorage()?.getItem("date");
   });
   const [moos, setMoos] = useState(() => {
-    const saved = localStorage.getItem("moos");
+    const saved = windowLocalStorage()?.getItem("moos");
     if (saved) {
       return JSON.parse(saved) as Array<Array<Cell>>;
     }
     return generateMoos(15);
   });
   const [clicked, setClicked] = useState(() => {
-    const saved = localStorage.getItem("clicked");
+    const saved = windowLocalStorage()?.getItem("clicked");
     if (saved) {
       return new Set<string>(JSON.parse(saved));
     }
     return new Set<string>();
   });
   const [foundMoos, setFoundMoos] = useState<Array<Coordinate>>(() => {
-    const saved = localStorage.getItem("foundMoos");
+    const saved = windowLocalStorage()?.getItem("foundMoos");
     if (saved) {
       return JSON.parse(saved) as Array<Coordinate>;
     }
     return [];
   });
   useEffect(() => {
-    localStorage.setItem("date", new Date().toDateString());
+    windowLocalStorage()?.setItem("date", new Date().toDateString());
   }, [date]);
 
   useEffect(() => {
     console.log("saving foundMoos", foundMoos);
-    localStorage.setItem("foundMoos", JSON.stringify(foundMoos));
+    windowLocalStorage()?.setItem("foundMoos", JSON.stringify(foundMoos));
   }, [foundMoos]);
 
   useEffect(() => {
-    localStorage.setItem("moos", JSON.stringify(moos));
+    windowLocalStorage()?.setItem("moos", JSON.stringify(moos));
   }, [moos]);
 
   useEffect(() => {
-    localStorage.setItem("clicked", JSON.stringify(Array.from(clicked.keys())));
+    windowLocalStorage()?.setItem(
+      "clicked",
+      JSON.stringify(Array.from(clicked.keys())),
+    );
   }, [clicked]);
 
   if (!date || date !== new Date().toDateString()) {
