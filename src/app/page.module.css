@@ -42,16 +42,25 @@ main.moo_main {
   width: 100%;
 }
 
-.moo_reset {
+.moo_button {
   margin-top: 20px;
   padding: 10px 20px;
   border: none;
-  background-color: var(--action-primary);
-  color: var(--background);
   font-size: 16px;
   border-radius: 5px;
   cursor: pointer;
   width: 100%;
+}
+
+.moo_share {
+  background-color: var(--action-primary);
+  color: var(--background);
+}
+
+.moo_reset {
+  border: 2px solid var(--action-primary);
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .moo_results {

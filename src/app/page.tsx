@@ -172,7 +172,22 @@ const MooPage = () => {
       </div>
       <div className={style.moo_controls}>
         <button
-          className={style.moo_reset}
+          className={style.moo_button + " " + style.moo_share}
+          onClick={() => {
+            const url = new URL(window.location.href);
+            window.navigator.share({
+              url: url.toString(),
+              title: `find-a-moo ${date}`,
+              text: `I found ${foundMoos.length / 3} moo${
+                foundMoos.length / 3 === 1 ? "" : "s"
+              } on ${date} - can you find more?`,
+            });
+          }}
+        >
+          Share
+        </button>
+        <button
+          className={style.moo_button + " " + style.moo_reset}
           onClick={() => {
             clearClicked();
             setFoundMoos([]);
