@@ -190,7 +190,7 @@ const MooPage = () => {
               title: `find-a-moo ${date}`,
               text: `I found ${foundMoos.length / 3} moo${
                 foundMoos.length / 3 === 1 ? "" : "s"
-              } on ${date} - can you find more?`,
+              } on ${date} - can you find more? #findamoo #makestupidapps`,
             });
           }}
         >
