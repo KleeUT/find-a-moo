@@ -1,5 +1,5 @@
 main.moo_main {
-  width: 90%;
+  width: 95%;
   margin: auto;
   max-width: 50rem;
   display: flex;
@@ -8,11 +8,7 @@ main.moo_main {
   align-items: center;
   padding: 1rem 0;
 }
-@media (min-width: 50rem) {
-  main.moo_main {
-    height: 100%;
-  }
-}
+
 .moo_row {
   display: flex;
   justify-content: center;
@@ -22,10 +18,11 @@ main.moo_main {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid var(--gray-alpha-200);
   margin: 1px;
   aspect-ratio: 1 / 1;
-  border-radius: 0.5rem;
+  border-radius: 0.2rem;
+  border: none;
+  /* border: 1px solid var(--action-secondary); */
 }
 .moo_cell_used {
   outline: 2px solid var(--action-primary);
@@ -58,8 +55,7 @@ main.moo_main {
 }
 
 .moo_reset {
-  border: 2px solid var(--action-primary);
-  background-color: var(--background);
+  background-color: var(--action-secondary);
   color: var(--foreground);
 }
 
@@ -68,4 +64,13 @@ main.moo_main {
   font-size: 18px;
   font-weight: bold;
   text-align: center;
+}
+
+@media (min-width: 50rem) {
+  main.moo_main {
+    height: 100%;
+  }
+  .moo_cell {
+    border-radius: 0.5rem;
+  }
 }
