@@ -548,6 +548,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/seedrandom@npm:^3":
+  version: 3.0.8
+  resolution: "@types/seedrandom@npm:3.0.8"
+  checksum: 10c0/6efdf3df34cd447ee235794946097c73b3d595a43d3afcf8a7edf08bf1111e32372f77edfe37478ba857d1d712361aff7022a5043c98a816dceb11a0e30e251c
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0":
   version: 8.42.0
   resolution: "@typescript-eslint/eslint-plugin@npm:8.42.0"
@@ -1821,11 +1828,13 @@ __metadata:
     "@types/node": "npm:^20"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
+    "@types/seedrandom": "npm:^3"
     eslint: "npm:^9"
     eslint-config-next: "npm:15.5.2"
     next: "npm:15.5.2"
     react: "npm:19.1.0"
     react-dom: "npm:19.1.0"
+    seedrandom: "npm:^3.0.5"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
@@ -3031,6 +3040,13 @@ __metadata:
   version: 0.26.0
   resolution: "scheduler@npm:0.26.0"
   checksum: 10c0/5b8d5bfddaae3513410eda54f2268e98a376a429931921a81b5c3a2873aab7ca4d775a8caac5498f8cbc7d0daeab947cf923dbd8e215d61671f9f4e392d34356
+  languageName: node
+  linkType: hard
+
+"seedrandom@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "seedrandom@npm:3.0.5"
+  checksum: 10c0/929752ac098ff4990b3f8e0ac39136534916e72879d6eb625230141d20db26e2f44c4d03d153d457682e8cbaab0fb7d58a1e7267a157cf23fd8cf34e25044e88
   languageName: node
   linkType: hard
 

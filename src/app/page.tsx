@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import style from "./page.module.css";
+import seedrandom from "seedrandom";
 type Cell = {
   used: boolean;
   clicked: boolean;
@@ -126,7 +127,7 @@ const MooPage = () => {
       </div>
       <div className={style.moo_results}>
         You&apos;ve found {foundMoos.length / 3} moo
-        {foundMoos.length / 3 === 1 ? "" : "s"}
+        {foundMoos.length / 3 === 1 ? "" : "s"} on {new Date().toDateString()}
       </div>
       <div className={style.moo_controls}>
         <button
@@ -145,18 +146,26 @@ const MooPage = () => {
 };
 
 function generateMoos(dimension: number): Array<Array<Cell>> {
-  const moos = new Array(dimension).fill(null).map(() => {
-    return new Array(dimension).fill(null).map(() => ({
+  // generate a date value consistent for today
+  const today = new Date();
+  const d =
+    today.getFullYear() * 10000 +
+    (today.getMonth() + 1) * 100 +
+    today.getDate();
+
+  const moos = new Array(dimension).fill(null).map((_1, i) => {
+    return new Array(dimension).fill(null).map((_2, j) => ({
       used: false,
       clicked: false,
-      letter: pick(),
+      letter: pick([i, j, d]),
     }));
   });
   return moos;
 }
 
-function pick(): "m" | "o" {
-  return Math.round(Math.random() * 3) < 1 ? "m" : "o";
+function pick(seeds: Array<number>): "m" | "o" {
+  const random = seedrandom(seeds.join(""));
+  return random() < 0.5 ? "m" : "o";
 }
 
 export default MooPage;

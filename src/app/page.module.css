@@ -2,17 +2,15 @@ main.moo_main {
   width: 90%;
   margin: auto;
   max-width: 50rem;
-  max-height: 100vh;
-  overflow: auto;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 1rem 0;
 }
 @media (min-width: 50rem) {
   main.moo_main {
-    width: 50%;
+    height: 100%;
   }
 }
 .moo_row {
