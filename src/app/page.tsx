@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import style from "./page.module.css";
 import seedrandom from "seedrandom";
 type Cell = {
@@ -14,52 +14,93 @@ type Coordinate = {
 };
 
 const MooPage = () => {
-  const [moos, setMoos] = useState(generateMoos(15));
-  const [clicked, setClicked] = useState(new Map<string, boolean>());
-  const [foundMoos, setFoundMoos] = useState<Array<Coordinate>>([]);
+  const [date, setDate] = useState(() => {
+    return localStorage.getItem("date");
+  });
+  const [moos, setMoos] = useState(() => {
+    const saved = localStorage.getItem("moos");
+    if (saved) {
+      return JSON.parse(saved) as Array<Array<Cell>>;
+    }
+    return generateMoos(15);
+  });
+  const [clicked, setClicked] = useState(() => {
+    const saved = localStorage.getItem("clicked");
+    if (saved) {
+      return new Set<string>(JSON.parse(saved));
+    }
+    return new Set<string>();
+  });
+  const [foundMoos, setFoundMoos] = useState<Array<Coordinate>>(() => {
+    const saved = localStorage.getItem("foundMoos");
+    if (saved) {
+      return JSON.parse(saved) as Array<Coordinate>;
+    }
+    return [];
+  });
+  useEffect(() => {
+    localStorage.setItem("date", new Date().toDateString());
+  }, [date]);
+
+  useEffect(() => {
+    console.log("saving foundMoos", foundMoos);
+    localStorage.setItem("foundMoos", JSON.stringify(foundMoos));
+  }, [foundMoos]);
+
+  useEffect(() => {
+    localStorage.setItem("moos", JSON.stringify(moos));
+  }, [moos]);
+
+  useEffect(() => {
+    localStorage.setItem("clicked", JSON.stringify(Array.from(clicked.keys())));
+  }, [clicked]);
+
+  if (!date || date !== new Date().toDateString()) {
+    setDate(new Date().toDateString());
+    setMoos(generateMoos(15));
+    setClicked(new Set());
+    setFoundMoos([]);
+  }
 
   function clearClicked() {
-    console.log("clearing clicked");
-    for (const key of clicked.keys()) {
+    for (const key of clicked) {
       const [i, j] = key.split("-").map(Number);
       moos[i][j].clicked = false;
     }
-    setClicked(new Map());
+    setClicked(new Set());
   }
 
   function click(i: number, j: number) {
-    console.log({ msg: `clicked ${i},${j}`, size: clicked.size });
     if (clicked.has(`${i}-${j}`)) {
       clicked.delete(`${i}-${j}`);
       moos[i][j].clicked = false;
     } else {
-      clicked.set(`${i}-${j}`, true);
-      console.log(clicked.size);
+      clicked.add(`${i}-${j}`);
       moos[i][j].clicked = true;
       setMoos([...moos]);
       if (clicked.size > 2) {
         if (isAMoo(clicked, foundMoos)) {
-          console.log("found a moo!");
-          foundMoos.push(
+          const updatedFoundMoos = [
+            ...foundMoos,
             ...Array.from(clicked.keys()).map((key) => {
               const [i, j] = key.split("-").map(Number);
               moos[i][j].used = true;
               return { i, j };
             }),
-          );
-          setFoundMoos(foundMoos);
+          ];
+          console.log("found a moo!", updatedFoundMoos);
+          setFoundMoos(updatedFoundMoos);
+        } else {
+          console.log("not a moo");
         }
         clearClicked();
         return;
       }
     }
-    setClicked(new Map(clicked));
+    setClicked(new Set(clicked));
   }
 
-  function isAMoo(
-    clicked: Map<string, boolean>,
-    foundMoos: Array<Coordinate>,
-  ): boolean {
+  function isAMoo(clicked: Set<string>, foundMoos: Array<Coordinate>): boolean {
     // check if the clicked cells form an "MOO" pattern
     const positions = Array.from(clicked.keys())
       .map((key) => {
@@ -127,7 +168,7 @@ const MooPage = () => {
       </div>
       <div className={style.moo_results}>
         You&apos;ve found {foundMoos.length / 3} moo
-        {foundMoos.length / 3 === 1 ? "" : "s"} on {new Date().toDateString()}
+        {foundMoos.length / 3 === 1 ? "" : "s"} on {date}
       </div>
       <div className={style.moo_controls}>
         <button
