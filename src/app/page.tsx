@@ -1,13 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import style from "./page.module.css";
-import seedrandom from "seedrandom";
-type Cell = {
-  used: boolean;
-  clicked: boolean;
-  letter: "m" | "o";
-};
-
+import { generateMoos } from "./moo-generator";
+import { Cell } from "./Cell";
 type Coordinate = {
   i: number;
   j: number;
@@ -210,28 +205,5 @@ const MooPage = () => {
     </main>
   );
 };
-
-function generateMoos(dimension: number): Array<Array<Cell>> {
-  // generate a date value consistent for today
-  const today = new Date();
-  const d =
-    today.getFullYear() * 10000 +
-    (today.getMonth() + 1) * 100 +
-    today.getDate();
-
-  const moos = new Array(dimension).fill(null).map((_1, i) => {
-    return new Array(dimension).fill(null).map((_2, j) => ({
-      used: false,
-      clicked: false,
-      letter: pick([i, j, d]),
-    }));
-  });
-  return moos;
-}
-
-function pick(seeds: Array<number>): "m" | "o" {
-  const random = seedrandom(seeds.join(""));
-  return random() < 0.5 ? "m" : "o";
-}
 
 export default MooPage;
