@@ -8,7 +8,6 @@ export default function PlainTextPage() {
       <pre>
         {moos.map((row) => row.map((cell) => cell.letter).join(" ")).join("\n")}
       </pre>
-      {Math.random()}
     </>
   );
 }
