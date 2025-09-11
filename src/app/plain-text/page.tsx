@@ -1,3 +1,4 @@
+"use client";
 import { generateMoos } from "../moo-generator";
 
 export default function PlainTextPage() {
