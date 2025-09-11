@@ -8,6 +8,17 @@ type Coordinate = {
   j: number;
 };
 
+type GameData = {
+  date: string;
+  currentSize: number;
+  mooData: {
+    [size: number]: {
+      moos: Array<Array<Cell>>;
+      foundMoos: Array<Coordinate>;
+    };
+  };
+};
+
 function windowLocalStorage(): Storage | null {
   if (typeof window !== "undefined") {
     return window.localStorage;
@@ -16,76 +27,88 @@ function windowLocalStorage(): Storage | null {
 }
 
 const MooPage = () => {
-  const [date, setDate] = useState(() => {
-    return windowLocalStorage()?.getItem("date");
-  });
-  const [moos, setMoos] = useState(() => {
-    const saved = windowLocalStorage()?.getItem("moos");
-    if (saved) {
-      return JSON.parse(saved) as Array<Array<Cell>>;
+  const [clicked, setClicked] = useState<Set<string>>(new Set<string>());
+  const [gameState, setGameState] = useState<GameData>(() => {
+    const storedGateState = windowLocalStorage()?.getItem("gameState");
+    if (storedGateState) {
+      return JSON.parse(storedGateState) as GameData;
     }
-    return generateMoos(15);
+
+    const data: Partial<GameData> = {};
+
+    data.date = windowLocalStorage()?.getItem("date") || "";
+    data.currentSize = 15;
+    const savedMoos = windowLocalStorage()?.getItem("moos");
+    const savedFoundMoos = windowLocalStorage()?.getItem("foundMoos");
+    data.mooData = {};
+    data.mooData[15] = {
+      moos: savedMoos ? JSON.parse(savedMoos) : generateMoos(15),
+      foundMoos: savedFoundMoos ? JSON.parse(savedFoundMoos) : [],
+    };
+    return data as GameData;
   });
-  const [clicked, setClicked] = useState(() => {
-    const saved = windowLocalStorage()?.getItem("clicked");
-    if (saved) {
-      return new Set<string>(JSON.parse(saved));
-    }
-    return new Set<string>();
-  });
-  const [foundMoos, setFoundMoos] = useState<Array<Coordinate>>(() => {
-    const saved = windowLocalStorage()?.getItem("foundMoos");
-    if (saved) {
-      return JSON.parse(saved) as Array<Coordinate>;
-    }
-    return [];
-  });
-  useEffect(() => {
-    windowLocalStorage()?.setItem("date", new Date().toDateString());
-  }, [date]);
 
   useEffect(() => {
-    console.log("saving foundMoos", foundMoos);
-    windowLocalStorage()?.setItem("foundMoos", JSON.stringify(foundMoos));
-  }, [foundMoos]);
+    console.log("UPdating state");
+    windowLocalStorage()?.setItem("gameState", JSON.stringify(gameState));
+  }, [gameState]);
 
-  useEffect(() => {
-    windowLocalStorage()?.setItem("moos", JSON.stringify(moos));
-  }, [moos]);
-
-  useEffect(() => {
-    windowLocalStorage()?.setItem(
-      "clicked",
-      JSON.stringify(Array.from(clicked.keys())),
-    );
-  }, [clicked]);
-
-  if (!date || date !== new Date().toDateString()) {
-    setDate(new Date().toDateString());
-    setMoos(generateMoos(15));
-    setClicked(new Set());
-    setFoundMoos([]);
+  if (!gameState.date || gameState.date !== new Date().toDateString()) {
+    console.log("New day, generating new moos");
+    resetGame();
   }
 
   function clearClicked() {
-    for (const key of clicked) {
-      const [i, j] = key.split("-").map(Number);
-      moos[i][j].clicked = false;
+    setClicked(new Set<string>());
+  }
+  function resetGame() {
+    setGameState({
+      date: new Date().toDateString(),
+      currentSize: gameState.currentSize,
+      mooData: {
+        [gameState.currentSize]: {
+          moos: generateMoos(gameState.currentSize),
+          foundMoos: [],
+        },
+      },
+    });
+  }
+
+  function setSize(size: number) {
+    if (size === gameState.currentSize) {
+      return;
     }
-    setClicked(new Set());
+    if (gameState.mooData[size]) {
+      setGameState((prevState) => ({
+        ...prevState,
+        currentSize: size,
+      }));
+      return;
+    } else {
+      setGameState((prevState) => ({
+        ...prevState,
+        currentSize: size,
+        mooData: {
+          ...prevState.mooData,
+          [size]: {
+            moos: generateMoos(size),
+            foundMoos: [],
+          },
+        },
+      }));
+    }
   }
 
   function click(i: number, j: number) {
+    const moos = gameState.mooData[gameState.currentSize]?.moos;
+    let foundMoos = gameState.mooData[gameState.currentSize]?.foundMoos || [];
     if (clicked.has(`${i}-${j}`)) {
       clicked.delete(`${i}-${j}`);
-      moos[i][j].clicked = false;
     } else {
       clicked.add(`${i}-${j}`);
-      moos[i][j].clicked = true;
-      setMoos([...moos]);
       if (clicked.size > 2) {
         if (isAMoo(clicked, foundMoos)) {
-          const updatedFoundMoos = [
+          foundMoos = [
             ...foundMoos,
             ...Array.from(clicked.keys()).map((key) => {
               const [i, j] = key.split("-").map(Number);
@@ -93,16 +116,24 @@ const MooPage = () => {
               return { i, j };
             }),
           ];
-          console.log("found a moo!", updatedFoundMoos);
-          setFoundMoos(updatedFoundMoos);
+          console.log("found a moo!", foundMoos);
         } else {
           console.log("not a moo");
         }
         clearClicked();
-        return;
       }
     }
-    setClicked(new Set(clicked));
+    setGameState({
+      ...gameState,
+      mooData: {
+        ...gameState.mooData,
+        [gameState.currentSize]: {
+          ...gameState.mooData[gameState.currentSize],
+          moos,
+          foundMoos,
+        },
+      },
+    });
   }
 
   function isAMoo(clicked: Set<string>, foundMoos: Array<Coordinate>): boolean {
@@ -149,9 +180,44 @@ const MooPage = () => {
     return letters === "moo" || letters === "oom";
   }
 
+  const moos = gameState.mooData[gameState.currentSize]?.moos;
+  const foundMoos = gameState.mooData[gameState.currentSize]?.foundMoos || [];
+  const date = gameState.date || new Date().toDateString();
   return (
     <main className={style.moo_main}>
       <h1>🐮 find-a-moo 🐮</h1>
+      <div className={style.moo_size_buttons}>
+        <button
+          onClick={() => setSize(5)}
+          className={
+            style.moo_button +
+            " " +
+            (gameState.currentSize === 5 ? style.moo_button_selected : "")
+          }
+        >
+          Micro Moo
+        </button>
+        <button
+          onClick={() => setSize(10)}
+          className={
+            style.moo_button +
+            " " +
+            (gameState.currentSize === 10 ? style.moo_button_selected : "")
+          }
+        >
+          Mini Moo
+        </button>
+        <button
+          onClick={() => setSize(15)}
+          className={
+            style.moo_button +
+            " " +
+            (gameState.currentSize === 15 ? style.moo_button_selected : "")
+          }
+        >
+          Maxi Moo
+        </button>
+      </div>
       <div className={style.moo_board}>
         {moos.map((row, i) => (
           <div key={i} className={style.moo_row}>
@@ -161,7 +227,7 @@ const MooPage = () => {
                 className={
                   style.moo_cell +
                   (cell.used ? ` ${style.moo_cell_used}` : "") +
-                  (cell.clicked ? ` ${style.moo_cell_clicked}` : "")
+                  (clicked.has(`${i}-${j}`) ? ` ${style.moo_cell_clicked}` : "")
                 }
                 onClick={() => click(i, j)}
               >
@@ -195,8 +261,7 @@ const MooPage = () => {
           className={style.moo_button + " " + style.moo_reset}
           onClick={() => {
             clearClicked();
-            setFoundMoos([]);
-            setMoos(generateMoos(15));
+            resetGame();
           }}
         >
           Reset

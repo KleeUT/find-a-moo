@@ -5,6 +5,7 @@ function generateMoos(dimension: number): Array<Array<Cell>> {
   // generate a date value consistent for today
   const today = new Date();
   const d =
+    dimension +
     today.getFullYear() * 10000 +
     (today.getMonth() + 1) * 100 +
     today.getDate();
