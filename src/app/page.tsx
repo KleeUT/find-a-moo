@@ -36,18 +36,16 @@ const MooPage = () => {
       return JSON.parse(storedGateState) as GameData;
     }
 
-    const data: Partial<GameData> = {};
-
-    data.date = windowLocalStorage()?.getItem("date") || "";
-    data.currentSize = boardSizes.maxi;
-    const savedMoos = windowLocalStorage()?.getItem("moos");
-    const savedFoundMoos = windowLocalStorage()?.getItem("foundMoos");
-    data.mooData = {};
-    data.mooData[boardSizes.maxi] = {
-      moos: savedMoos ? JSON.parse(savedMoos) : generateMoos(boardSizes.maxi),
-      foundMoos: savedFoundMoos ? JSON.parse(savedFoundMoos) : [],
+    return {
+      date: new Date().toDateString(),
+      currentSize: boardSizes.maxi,
+      mooData: {
+        [boardSizes.maxi]: {
+          moos: generateMoos(boardSizes.maxi),
+          foundMoos: [],
+        },
+      },
     };
-    return data as GameData;
   });
 
   useEffect(() => {
@@ -55,7 +53,7 @@ const MooPage = () => {
     windowLocalStorage()?.setItem("gameState", JSON.stringify(gameState));
   }, [gameState]);
 
-  if (!gameState.date || gameState.date !== new Date().toDateString()) {
+  if (!gameState || gameState.date !== new Date().toDateString()) {
     console.log("New day, generating new moos");
     resetGame();
   }
