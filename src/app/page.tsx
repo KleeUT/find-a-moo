@@ -38,10 +38,10 @@ const MooPage = () => {
 
     return {
       date: new Date().toDateString(),
-      currentSize: boardSizes.maxi,
+      currentSize: boardSizes.mini,
       mooData: {
-        [boardSizes.maxi]: {
-          moos: generateMoos(boardSizes.maxi),
+        [boardSizes.mini]: {
+          moos: generateMoos(boardSizes.mini),
           foundMoos: [],
         },
       },
