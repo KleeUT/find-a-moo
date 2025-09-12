@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import style from "./page.module.css";
 import { generateMoos } from "./moo-generator";
 import { Cell } from "./Cell";
+import { boardSizes } from "./sizes";
 type Coordinate = {
   i: number;
   j: number;
@@ -37,12 +38,12 @@ const MooPage = () => {
     const data: Partial<GameData> = {};
 
     data.date = windowLocalStorage()?.getItem("date") || "";
-    data.currentSize = 15;
+    data.currentSize = boardSizes.maxi;
     const savedMoos = windowLocalStorage()?.getItem("moos");
     const savedFoundMoos = windowLocalStorage()?.getItem("foundMoos");
     data.mooData = {};
-    data.mooData[15] = {
-      moos: savedMoos ? JSON.parse(savedMoos) : generateMoos(15),
+    data.mooData[boardSizes.maxi] = {
+      moos: savedMoos ? JSON.parse(savedMoos) : generateMoos(boardSizes.maxi),
       foundMoos: savedFoundMoos ? JSON.parse(savedFoundMoos) : [],
     };
     return data as GameData;
@@ -188,31 +189,37 @@ const MooPage = () => {
       <h1>🐮 find-a-moo 🐮</h1>
       <div className={style.moo_size_buttons}>
         <button
-          onClick={() => setSize(5)}
+          onClick={() => setSize(boardSizes.micro)}
           className={
             style.moo_button +
             " " +
-            (gameState.currentSize === 5 ? style.moo_button_selected : "")
+            (gameState.currentSize === boardSizes.micro
+              ? style.moo_button_selected
+              : "")
           }
         >
           Micro Moo
         </button>
         <button
-          onClick={() => setSize(10)}
+          onClick={() => setSize(boardSizes.mini)}
           className={
             style.moo_button +
             " " +
-            (gameState.currentSize === 10 ? style.moo_button_selected : "")
+            (gameState.currentSize === boardSizes.mini
+              ? style.moo_button_selected
+              : "")
           }
         >
           Mini Moo
         </button>
         <button
-          onClick={() => setSize(15)}
+          onClick={() => setSize(boardSizes.maxi)}
           className={
             style.moo_button +
             " " +
-            (gameState.currentSize === 15 ? style.moo_button_selected : "")
+            (gameState.currentSize === boardSizes.maxi
+              ? style.moo_button_selected
+              : "")
           }
         >
           Maxi Moo
