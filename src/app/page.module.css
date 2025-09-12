@@ -38,7 +38,8 @@ main.moo_main {
   justify-content: center;
   align-items: center;
 }
-.moo_row > *:first-child {
+.moo_row > *:first-child,
+.moo_row > *:last-child {
   min-width: 1.5rem;
   flex-basis: 50%;
   font-size: 1rem;

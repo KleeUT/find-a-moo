@@ -181,7 +181,11 @@ const MooPage = () => {
     return letters === "moo" || letters === "oom";
   }
 
-  const columnPrefixesForSize = colPrefixes.slice(0, gameState.currentSize + 1);
+  const columnPrefixesForSize = [
+    "",
+    ...colPrefixes.slice(0, gameState.currentSize + 1),
+    "",
+  ];
   const rowPrefixesForSize = rowPrefixes.slice(0, gameState.currentSize);
   const moos = gameState.mooData[gameState.currentSize]?.moos.map((x, i) => {
     return [
@@ -191,6 +195,11 @@ const MooPage = () => {
         used: false,
       },
       ...x,
+      {
+        type: "prefix",
+        letter: rowPrefixesForSize[i],
+        used: false,
+      },
     ];
   });
   const foundMoos = gameState.mooData[gameState.currentSize]?.foundMoos || [];
@@ -270,6 +279,13 @@ const MooPage = () => {
             )}
           </div>
         ))}
+        <div className={style.moo_row}>
+          {columnPrefixesForSize.map((col, j) => (
+            <div key={col} className={style.moo_column_prefix}>
+              {col}
+            </div>
+          ))}
+        </div>
       </div>
       <div className={style.moo_results}>
         You&apos;ve found {foundMoos.length / 3} moo

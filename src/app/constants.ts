@@ -27,7 +27,6 @@ export const rowPrefixes = [
   "Z",
 ];
 export const colPrefixes = [
-  "",
   "1",
   "2",
   "3",
