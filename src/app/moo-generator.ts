@@ -11,11 +11,15 @@ function generateMoos(dimension: number): Array<Array<Cell>> {
     today.getDate();
 
   const moos = new Array(dimension).fill(null).map((_1, i) => {
-    return new Array(dimension).fill(null).map((_2, j) => ({
-      used: false,
-      clicked: false,
-      letter: pick([i, j, d]),
-    }));
+    return new Array(dimension).fill(null).map(
+      (_2, j) =>
+        ({
+          used: false,
+          clicked: false,
+          letter: pick([i, j, d]),
+          type: "normal",
+        } as Cell),
+    );
   });
   return moos;
 }

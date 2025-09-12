@@ -27,6 +27,64 @@ function windowLocalStorage(): Storage | null {
   return null;
 }
 
+const rowPrefixes = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+];
+const colPrefixes = [
+  "",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23",
+  "24",
+  "25",
+  "26",
+];
+
 const MooPage = () => {
   const [clicked, setClicked] = useState<Set<string>>(new Set<string>());
   const [gameState, setGameState] = useState<GameData>(() => {
@@ -138,6 +196,7 @@ const MooPage = () => {
   }
 
   function isAMoo(clicked: Set<string>, foundMoos: Array<Coordinate>): boolean {
+    const moos = gameState.mooData[gameState.currentSize]?.moos;
     // check if the clicked cells form an "MOO" pattern
     const positions = Array.from(clicked.keys())
       .map((key) => {
@@ -181,7 +240,18 @@ const MooPage = () => {
     return letters === "moo" || letters === "oom";
   }
 
-  const moos = gameState.mooData[gameState.currentSize]?.moos;
+  const columnPrefixesForSize = colPrefixes.slice(0, gameState.currentSize + 1);
+  const rowPrefixesForSize = rowPrefixes.slice(0, gameState.currentSize);
+  const moos = gameState.mooData[gameState.currentSize]?.moos.map((x, i) => {
+    return [
+      {
+        type: "prefix",
+        letter: rowPrefixesForSize[i],
+        used: false,
+      },
+      ...x,
+    ];
+  });
   const foundMoos = gameState.mooData[gameState.currentSize]?.foundMoos || [];
   const date = gameState.date || new Date().toDateString();
   return (
@@ -226,21 +296,37 @@ const MooPage = () => {
         </button>
       </div>
       <div className={style.moo_board}>
+        <div className={style.moo_row}>
+          {columnPrefixesForSize.map((col, j) => (
+            <div key={col} className={style.moo_column_prefix}>
+              {col}
+            </div>
+          ))}
+        </div>
         {moos.map((row, i) => (
           <div key={i} className={style.moo_row}>
-            {row.map((cell, j) => (
-              <button
-                key={j}
-                className={
-                  style.moo_cell +
-                  (cell.used ? ` ${style.moo_cell_used}` : "") +
-                  (clicked.has(`${i}-${j}`) ? ` ${style.moo_cell_clicked}` : "")
-                }
-                onClick={() => click(i, j)}
-              >
-                {cell.letter}
-              </button>
-            ))}
+            {row.map((cell, j) =>
+              cell.type === "prefix" ? (
+                <div className={style.moo_row_prefix} key={cell.letter}>
+                  {cell.letter}
+                </div>
+              ) : (
+                <button
+                  key={j}
+                  className={
+                    style.moo_cell +
+                    (cell.used ? ` ${style.moo_cell_used}` : "") +
+                    (clicked.has(`${i}-${j - 1}`)
+                      ? ` ${style.moo_cell_clicked}`
+                      : "") +
+                    (cell.type === "prefix" ? ` ${style.moo_row_prefix}` : "")
+                  }
+                  onClick={() => click(i, j - 1)}
+                >
+                  {cell.letter}
+                </button>
+              ),
+            )}
           </div>
         ))}
       </div>
