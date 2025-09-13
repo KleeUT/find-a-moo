@@ -183,7 +183,7 @@ const MooPage = () => {
 
   const columnPrefixesForSize = [
     "",
-    ...colPrefixes.slice(0, gameState.currentSize + 1),
+    ...colPrefixes.slice(0, gameState.currentSize),
     "",
   ];
   const rowPrefixesForSize = rowPrefixes.slice(0, gameState.currentSize);
