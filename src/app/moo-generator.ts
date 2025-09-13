@@ -1,6 +1,6 @@
 import seedrandom from "seedrandom";
 import { Cell } from "./Cell";
-
+const moo: Array<"m" | "o"> = ["m", "o", "o"];
 function generateMoos(dimension: number): Array<Array<Cell>> {
   // generate a date value consistent for today
   const today = new Date();
@@ -26,6 +26,6 @@ function generateMoos(dimension: number): Array<Array<Cell>> {
 
 function pick(seeds: Array<number>): "m" | "o" {
   const random = seedrandom(seeds.join(""));
-  return random() < 0.5 ? "m" : "o";
+  return moo[Math.floor(random() * 3)];
 }
 export { generateMoos };
