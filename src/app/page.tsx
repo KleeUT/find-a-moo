@@ -301,7 +301,12 @@ const MooPage = () => {
               title: `find-a-moo ${date}`,
               text: `I found ${foundMoos.length / 3} moo${
                 foundMoos.length / 3 === 1 ? "" : "s"
-              } on ${date} - can you find more? #findamoo #makestupidapps`,
+              } in ${Object.entries(boardSizes)
+                .filter(([_, v]) => v === gameState.currentSize)
+                .map(([k, _]) => k)
+                .join(
+                  ", ",
+                )}-moo, on ${date} - can you find more? #findamoo #makestupidapps`,
             });
           }}
         >
